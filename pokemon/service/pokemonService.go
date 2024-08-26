@@ -71,7 +71,7 @@ func AddPokemonToPokedex(name string, pokemon model.Pokemon) (*model.Pokedex, er
 func fetchPokemonByName(session *gocql.Session, name string) (*model.Pokemon, error) {
 	var pokemon model.Pokemon
 
-	dao.FetchPokemonFromDB(session, name)
+	pokemon = dao.FetchPokemonFromDB(session, name)
 	//fetch from cassandra, only fetch API if it doesn't currently exist
 	url := "https://pokeapi.co/api/v2/pokemon"
 
