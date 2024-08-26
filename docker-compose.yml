@@ -1,0 +1,14 @@
+version: '3'
+services:
+  cassandra:
+    image: cassandra:4.0
+    container_name: cassandra
+    ports:
+      - "9042:9042"  # Cassandra default port
+    environment:
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+
+volumes:
+  cassandra-data:
