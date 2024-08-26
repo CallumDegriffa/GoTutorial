@@ -3,7 +3,7 @@ services:
     image: cassandra:4.0
     container_name: cassandra
     ports:
-      - "9042:9042"  # Cassandra default port
+      - "9042:9042"
     environment:
       - CASSANDRA_CLUSTER_NAME=MyCluster
     volumes:
@@ -16,7 +16,7 @@ services:
       timeout: 10s
 
   go-tutorial:
-    image: go-tutorial  # Replace with the name of your Docker image
+    image: go-tutorial
     container_name: go-tutorial
     build:
       context: .
@@ -24,10 +24,10 @@ services:
       cassandra:
         condition: service_healthy
     environment:
-      - CASSANDRA_HOST=cassandra  # Name of the Cassandra service
+      - CASSANDRA_HOST=cassandra
       - CASSANDRA_PORT=9042
     ports:
-      - "8080:8080"  # Replace with the port your Go app listens on
+      - "8080:8080"
 
 
 volumes:
