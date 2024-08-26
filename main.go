@@ -44,6 +44,7 @@ func initializeDB() (*gocql.Session, error) {
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("something went wrong %s", err))
+		return nil, err
 	}
 
 	cluster.Keyspace = "gotutorialspace"
@@ -51,8 +52,9 @@ func initializeDB() (*gocql.Session, error) {
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("something went wrong %s", err))
+		return nil, err
 	}
 
 	dao.InitializeDB(session)
-	return session, err
+	return session, nil
 }
