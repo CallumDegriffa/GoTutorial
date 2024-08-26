@@ -5,6 +5,7 @@ import (
 	"GoTutorial/pokemon/service"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gocql/gocql"
 	"net/http"
 )
 
@@ -19,8 +20,8 @@ func GetPokedex(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, pokedex)
 }
 
-func GetPokemonByName(context *gin.Context) {
-	pokemon, err := service.FetchPokemonByName(getNameParam(context))
+func GetPokemonByName(session *gocql.Session, context *gin.Context) {
+	pokemon, err := service.FetchPokemonByName(session, getNameParam(context))
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("could not fetch pokemon %s", err))

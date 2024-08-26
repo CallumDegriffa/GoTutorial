@@ -15,8 +15,8 @@ var pokedexList = []model.Pokedex{{
 	PokemonMaster: model.PokemonMaster{Name: "Ash", Rank: "Intermediate"},
 }}
 
-func FetchPokemonByName(name string) (*model.Pokemon, error) {
-	return fetchPokemonByName(name)
+func FetchPokemonByName(session *gocql.Session, name string) (*model.Pokemon, error) {
+	return fetchPokemonByName(session, name)
 }
 
 func IncrementPokemonHealth(pokemonName string, pokeMasterName string) (*model.Pokemon, error) {
@@ -71,26 +71,28 @@ func AddPokemonToPokedex(name string, pokemon model.Pokemon) (*model.Pokedex, er
 func fetchPokemonByName(session *gocql.Session, name string) (*model.Pokemon, error) {
 	var pokemon model.Pokemon
 
-	pokemon = dao.FetchPokemonFromDB(session, name)
+	pokemon = dao.FetchPokemon(session, name)
 	//fetch from cassandra, only fetch API if it doesn't currently exist
-	url := "https://pokeapi.co/api/v2/pokemon"
 
-	// Perform the GET request
-	resp, err := http.Get(url + "/" + name)
-	if err != nil {
-		fmt.Println("fetch error:", err)
-		return nil, err
-	}
-	// Make sure to close the response body when done
-	defer resp.Body.Close()
+	if &pokemon == nil {
+		url := "https://pokeapi.co/api/v2/pokemon"
 
-	body, err := ioutil.ReadAll(resp.Body)
+		// Perform the GET request
+		resp, err := http.Get(url + "/" + name)
+		if err != nil {
+			fmt.Println("fetch error:", err)
+			return nil, err
+		}
+		// Make sure to close the response body when done
+		defer resp.Body.Close()
 
-	err = json.Unmarshal(body, &pokemon)
+		body, err := ioutil.ReadAll(resp.Body)
 
-	if err != nil {
-		fmt.Println("Error unmarshaling JSON:", err)
-		return nil, err
+		err = json.Unmarshal(body, &pokemon)
+		if err != nil {
+			fmt.Println("Error unmarshaling JSON:", err)
+			return nil, err
+		}
 	}
 
 	return &pokemon, nil
