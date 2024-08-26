@@ -20,13 +20,13 @@ func InitializeDB(session *gocql.Session) {
 		log.Fatal(err)
 	}
 
-	err = session.Query(`CREATE TABLE IF NOT EXISTS goTutorialSpace.pokemon (pokemon_name TEXT, poke_master_name TEXT, pokemon_weight INT, pokemon_health INT, PRIMARY KEY (pokemon_name))`).Exec()
+	err = session.Query(`CREATE TABLE IF NOT EXISTS goTutorialSpace.pokemon (pokemon_name TEXT, pokemon_weight INT, pokemon_health INT, PRIMARY KEY (pokemon_name))`).Exec()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = session.Query(`INSERT INTO goTutorialSpace.pokemon (pokemon_name, poke_master_name, pokemon_weight, pokemon_health) VALUES (?, ?, ?, ?)`, "ekans", "Ash", 30, 50).Exec(); err != nil {
+	if err = session.Query(`INSERT INTO goTutorialSpace.pokemon (pokemon_name, pokemon_weight, pokemon_health) VALUES (?, ?, ?)`, "ekans", 30, 50).Exec(); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -40,4 +40,16 @@ func FetchPokemon(session *gocql.Session, pokemonName string) model.Pokemon {
 	fmt.Printf("Retrieved pokemon: Name=%s", pokemon.Name)
 
 	return pokemon
+}
+
+func AddPokemon(session *gocql.Session, pokemon *model.Pokemon) error {
+
+	if err := session.Query(`INSERT INTO goTutorialSpace.pokemon (pokemon_name, pokemon_health, pokemon_weight)  values (?, ?, ?)`, pokemon.Name, pokemon.Health, pokemon.Weight).Consistency(gocql.One).Exec(); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	fmt.Printf("Inserted pokemon: Name=%s", pokemon.Name)
+
+	return nil
 }

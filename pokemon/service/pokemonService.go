@@ -68,6 +68,16 @@ func AddPokemonToPokedex(name string, pokemon model.Pokemon) (*model.Pokedex, er
 	return pokedex, nil
 }
 
+func AddPokemon(session *gocql.Session, pokemon *model.Pokemon) error {
+	err := dao.AddPokemon(session, pokemon)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func fetchPokemonByName(session *gocql.Session, name string) (*model.Pokemon, error) {
 	var pokemon model.Pokemon
 

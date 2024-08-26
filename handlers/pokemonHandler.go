@@ -43,22 +43,39 @@ func IncrementPokemonHealth(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, pokemon)
 }
 
-func AddPokemon(context *gin.Context) {
+func AddPokemonToPokedex(context *gin.Context) {
 	var newPokemon model.Pokemon
 
 	if err := context.BindJSON(&newPokemon); err != nil {
 		fmt.Errorf("invalid pokemon %w", model.PokemonError{Message: "pokemon provided is invalid"})
 		return
 	}
-	name := context.Query("name")
+	trainerName := context.Query("trainerName")
 
-	pokedex, err := service.AddPokemonToPokedex(name, newPokemon)
+	pokedex, err := service.AddPokemonToPokedex(trainerName, newPokemon)
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("could not add to pokedex %s", err))
 	}
 
 	context.IndentedJSON(http.StatusCreated, pokedex)
+}
+
+func AddPokemon(session *gocql.Session, context *gin.Context) {
+	var newPokemon model.Pokemon
+
+	if err := context.BindJSON(&newPokemon); err != nil {
+		fmt.Errorf("invalid pokemon %w", model.PokemonError{Message: "pokemon provided is invalid"})
+		return
+	}
+
+	err := service.AddPokemon(session, &newPokemon)
+
+	if err != nil {
+		fmt.Println(fmt.Errorf("could not add to pokedex %s", err))
+	}
+
+	context.Status(http.StatusCreated)
 }
 
 func getNameParam(context *gin.Context) string {

@@ -16,6 +16,12 @@ func getPokemonByName(session *gocql.Session) gin.HandlerFunc {
 	}
 }
 
+func AddPokemon(session *gocql.Session) gin.HandlerFunc {
+	return func(context *gin.Context) {
+		handlers.AddPokemon(session, context)
+	}
+}
+
 func main() {
 	session, _ := initializeDB()
 
@@ -23,7 +29,8 @@ func main() {
 	router.GET("/pokemon/pokedex/:name", handlers.GetPokedex)
 	router.GET("/pokemon/:name", getPokemonByName(session))
 	router.PATCH("/pokemon/health/increase/:name", handlers.IncrementPokemonHealth)
-	router.POST("/pokemon/pokedex", handlers.AddPokemon)
+	router.POST("/pokemon/pokedex", handlers.AddPokemonToPokedex)
+	router.POST("/pokemon/addPokemon", AddPokemon(session))
 
 	//TODO error handling?
 	err := router.Run("localhost:8080")
@@ -33,7 +40,12 @@ func main() {
 }
 
 func initializeDB() (*gocql.Session, error) {
-	cluster := gocql.NewCluster(os.Getenv("CASSANDRA_HOST"))
+	cassandraHost := os.Getenv("CASSANDRA_HOST")
+
+	if cassandraHost == "" {
+		cassandraHost = "localhost"
+	}
+	cluster := gocql.NewCluster(cassandraHost)
 	session, err := cluster.CreateSession()
 	if err != nil {
 		log.Fatal(err)
